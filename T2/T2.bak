@@ -1,0 +1,102 @@
+#lang play
+
+#| ==============================
+            EJERCICIO 1
+   ============================== |#
+
+#| PARTE A |#
+
+#|
+s-Cond ::=
+    | < <sym> <num>
+    | > <sym> <num>
+    | = <sym> <num>
+    | & s-Cond s-Cond
+    | orb s-Cond s-Cond
+|#
+
+(deftype s-Cond
+  (< sym num)
+  (> sym num)
+  (= sym num)
+  (& s-cond1 s-con2)
+  (orb s-cond1 s-cond2))
+
+#|
+s-Cmd ::=
+    CREATE <sym> (listOf sym) s-Cmd
+    INSERT (listOf num) <sym> s-Cmd
+    FROM <sym> SELECT regs WHERE s-Cond
+|#
+
+(deftype s-Cmd
+  (CREATE sym listOfsym s-cmd)
+  (INSERT listOfnum sym s-cmd)
+  (FROM sym regs s-cond))
+
+
+
+#| PARTE B |#
+
+;; parse-Cond :: s-Cond -> Cond
+;; s-conds used as concrete 
+;; syntax for our programs
+
+(define (parse-Cond s-cond)
+  (match s-cond
+    [(list '< l r) (< l r)]
+    [(list '> l r) (> l r)]
+    [(list '= l r) (= l r)]
+    [(list '& l r) (& (parse-Cond l) (parse-Cond r))]
+    [(list 'orb l r) (orb (parse-Cond l) (parse-Cond r))]))
+
+
+
+;; parse :: s-Cmd -> Cmd
+;; s-Cmds used as concrete 
+;; syntax for our programs
+(define (parse s-cmd)
+  (match s-cmd
+    [(list 'CREATE name column cmd) (CREATE x l (parse cmd))]
+    [(list 'INSERT l x cmd) (INSERT l x (parse cmd))]
+    [(list 'FROM x r cond) (FROM x r (parse-Cond cond))]))
+
+
+
+#| ==============================
+            EJERCICIO 2
+   ============================== |#
+
+#| PARTE A |#
+;; check-table :: Cmd -> Boolean / Error
+
+
+
+
+#| PARTE B |#
+;; check-arity :: Cmd -> Boolean / Error
+
+
+
+#| PARTE C |#
+;; check-column :: Cmd -> Boolean / Error
+
+
+
+#| PARTE D |#
+;; static-check :: Cmd -> Boolean / Error
+
+
+
+
+#| ==============================
+            EJERCICIO 3
+   ============================== |#
+
+#| PARTE A |#
+;; interp-cmd :: Cmd Env -> List[Reg] 
+
+ 
+#| PARTE B |#
+;; run :: <s-Cmd> -> List[Reg] / Error
+

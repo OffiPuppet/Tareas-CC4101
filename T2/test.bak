@@ -1,0 +1,19 @@
+#lang play
+(require "T2.rkt")
+
+(print-only-errors #t)
+
+#| ==============================
+            EJERCICIO 1
+   ============================== |#
+
+
+#| PARTE A |#
+
+
+
+#| PARTE B |#
+
+(define my-s-Cmd '(CREATE A (a b c) (INSERT (1 2 3) A (INSERT (4 5 6) A (FROM A regs (& (> a 1) (< a 3)))))))
+
+(parse my-s-Cmd)

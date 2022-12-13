@@ -1,0 +1,97 @@
+#lang play
+
+#|
+
+   ========================================
+                   Tarea 3
+   ========================================
+   Nombre: Kevin Alexis Iturra Carreño
+   Rut: 20.532.318-K
+
+|#
+
+
+#|
+<expr> ::= (num <num>)
+         | (add <expr> <expr>)
+         | (sub <expr> <expr>)
+         | (if0 <expr> <expr> <expr>)
+         | (with <sym> <expr> <expr>)
+         | (id <id>)
+         | (fun <sym> <expr>)
+         | (app <expr> <expr>)
+|#
+;; deftype del Lenguaje de una expr
+(deftype Expr
+  (num n)
+  (add l r)
+  (sub l r)
+  (if0 c t f)
+  (with x ne b)
+  (fun id body)
+  (id s)
+  (app fun-expr arg-expr))
+
+
+;; --------- [ Parte 1 ] ---------
+
+;;parse :: s-expr -> Expr
+(define (parse expr)
+  (match expr
+    [n #:when (number? n) (num n)]
+    [(list '+ l r) (add (parse l) (parse r))]
+    [(list '- l r) (sub (parse l) (parse r))]
+    [(list 'if0 c l r) (if0 (parse c) (parse l) (parse r))]
+    [(list 'with x ne b) (with x (parse ne) (parse b))]
+    [(list 'fun (list x) body) (fun id (parse body))]
+    [(app fun-expr arg-expr) (app (parse fun-expr) (parse arg-expr))]
+    [x #:when (symbol? x) (id x)]))
+
+;; const? :: Expr -> bool
+;; indica si es que la expresión entregada consiste en sólo constantes numéricas, posiblemente combinadas 
+;; a través de operadores aritméticos y/o condicionales y/o definiciones locales.
+(define (const? expr)
+  (match expr
+    (cond
+      [(num expr) #t]
+      [(id _) #f]
+      [(fun? _ _) #f]
+      [(app? _ _) #f]
+      [(add l r) (and (const? l) (const? r))]
+      [(sub l r) (and (const? l) (const? r))]
+      [(if0 c t f) (and (const? c) (const? t) (const? f))]
+      [(with x ne b) (and (const? ne) (const? b))]))) ;;revisar el with en todas desde acá
+
+;; fold-consts :: Expr -> Expr
+;; fold-consts aplica constant folding recursivamente a una expresión
+(define (fold-consts e)
+  (match e
+    [(num n) (num n)]
+    [(id s) (id s)]
+    [(fun id body) (fun id (fold-consts body))] ;;revisar el caso de app
+    [(app fun-expr arg-expr) (app (fold-consts fun-expr) (fold-consts arg-expr))]
+    [(add l r) (cond
+                 [(and (const? l) (const? r)) (num (+ (fold-consts l) (fold-consts r)))]
+                 [else (add (fold-consts l) (fold-consts r))])]
+    [(sub l r) (cond
+                 [(and (const? l) (const? r)) (num (- (fold-consts l) (fold-consts r)))]
+                 [else (sub (fold-consts l) (fold-consts r))])]
+    [(if0 c t f) (cond
+                   [(and (const? c) (const? t) (const? f)) (cond
+                                                             [(zero? (fold-consts c)) (fold-consts t)]
+                                                             [else (fold-consts f)])]
+                   [else (if0 (fold-consts c) (fold-consts t) (fold-consts f))])]
+    [(with x ne b) (with x (fold-consts ne) (fold-consts b))]))
+
+;; --------- [ Parte 2 ] ---------
+
+;; propagate-consts :: Expr -> Expr
+;; aplica constant propagation recursivamente. Su implementación deberá propagar las constantes bottom-up, es decir desde las expresiones más internas, hacia la más externas
+
+  
+
+
+;; --------- [ Parte 3 ] ---------
+
+;; cf&p :: Expr -> Expr
+
